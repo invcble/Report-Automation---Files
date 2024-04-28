@@ -1,0 +1,1477 @@
+---
+title: ""
+output: pdf_document
+
+---
+
+```{r include=FALSE}
+options(repos="https://cran.rstudio.com" )
+
+install.packages(c('ggplot2', 'dplyr', 'grid', 'gridExtra', 'tidyr', 'glue'))
+library(ggplot2)
+library(dplyr)
+library(grid) 
+library(gridExtra)
+library(tidyr)
+library(glue)
+
+# Change the number for each knit to obtain each student's report.
+s = 1
+
+
+#You don't have to pull in the data again ONLY IF it is already in your global environment. Here I only want the Combined dataset since we aren't pulling in the National Averages and thus don't need the national dataset
+dat.long <- read.csv('CombinedDataNational.csv')
+
+# Separate scores from ranges
+# This will insert NAs into the cohort range
+dat.long <- dat.long %>% 
+  separate(Score, into = c("Score", "range"), sep = " ") %>% 
+  mutate(Score = as.numeric(Score))
+
+# Remove NAs from cohort range and replace with blank space
+# This ensures 'NA' doesn't print on the bar chart
+dat.long$range[is.na(dat.long$range)] <- ' '
+
+```
+
+```{r} 
+#KEY NOTES: The report graphing code pulls the variables in order from the dataframe. So at this point, the combined dataset has a a column for first name, last name, ID, ScaleID, Scale, and Score. It pulls the Scale column name within each person in order. For example, for LEff, if we tell the code "scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) " then we will need to make sure that the Scale of LEffx is first for that person and then followed by XLEff to reflect the cohort average score. 
+
+#--> The data frame will be ordered in the order I did it in the code, but to be safe, I could add letters in alphabetical order to the start of the variable name. For instance aLEffx, bXLEff, cLEffsup etc.I will only do this later if needed. 
+
+#Also, when adding more bars to the graph, I will likely need to play with the sizing of aesthetics. So, I may need to change the x and y in the code "geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2')"
+install.packages("rlang")
+
+```
+
+
+Attitude and Motivation Towards Leading
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('MOTAI', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('MOTSN', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('MOTNC', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+ geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('LEff', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm')) 
+
+```
+
+
+Leadership Abilities
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('MOTI', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SI', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) + 
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('MCON', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('WIT', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+#^Dark blue and green should always have ranges. The teal and yellow never should. 
+
+Empowering Leadership
+ 
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('LBE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('PDM', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) + 
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('COACH', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('INF', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) + 
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SCTI', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+Inclusive Leadership
+```{r}
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('SG', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('EJ', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('SD', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('ED', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('HG', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 9, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+        
+Visionary & Meaning-Based Leadership
+
+```{r}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('VL', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 5, 1), limits = c(0, 5), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('MBL', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 5, 1), limits = c(0, 5), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+
+
+Knowledge Sharing
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SAFE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('ITT', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('KS', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('IE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.5, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+Political Skills 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('NET', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('II', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SAS', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('ASN', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+
+Attitudes Towards Others - Cooperation
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('COOP', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+```
+
+Teaming Approach and Skills (TMX, SL, CRE)
+  
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('TMX', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 4, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.2, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SL', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('CRE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score', 'Total Average Peer Rating', 'Supervisor or Skip-Level', 'Team Member, Same Department', 'Team Member, Different Department', 'Direct Report', 'Partner', 'Supplier')), values=c('#58a7ea', '#65efdb', '#64CA55', '#EFCD5B','#FF6F00', '#BF360C', '#F8BBD0', '#9C27B0', '#BDBDBD')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=3.2, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+
+Resistance to Change & Attitudes
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('RTCRS', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 3, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+        
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('RTCER', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 3, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+        
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('PT', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 3, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('PP', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 3, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+
+```
+
+
+
+
+EI
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('EISE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('EIOE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('EIUE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('EIRE', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+
+Belongingness & Uniqueness 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('Bel', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('Uniq', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) +
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+
+Values
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('ALT', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('PAY', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('REL', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('SEC', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+Values page 2
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=TRUE}
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>%
+  filter(ScaleID == paste0('AUTH', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('VAR', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('AUTO', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+dat.long %>% 
+  mutate(label = glue("{Score} {range}")) %>% 
+  filter(ScaleID == paste0('PRES', s)) %>%
+  ggplot(aes(x=Scale, y=Score)) + 
+  geom_bar(aes(x=1.54, y=Score+.23), width=2, fill='#cccccc', alpha=.5, stat='identity', position='dodge2') +
+  geom_bar(aes(x=Scale, y=Score, fill=Scale), stat = 'identity', width=.9, alpha=1, position='dodge') +
+  ggtitle(label='') +
+  scale_y_continuous(breaks=seq(1, 7, 1), limits = c(0, 7), expand=c(0,0)) +  
+  scale_x_discrete(labels=element_blank()) +    
+  scale_fill_manual(label=paste0(c('Your Score', 'Cohort Score')), values=c('#58a7ea', '#65efdb')) + 
+  guides(fill = guide_legend(nrow = 2, reverse = F)) +
+  geom_text(aes(x=Scale, label=label, y=1.5), size=8, color='#000000') +
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(size=10),
+        panel.background = element_rect(fill = NA),
+        panel.grid.major.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#666666", linetype='dotted'),
+        panel.grid.minor = element_blank(),
+        panel.border = element_blank(),
+        legend.position = 'none',
+        legend.title = element_blank(),
+        axis.line.x = element_line(color='#333333', size=0.5), 
+        axis.line.y = element_line(color='#333333', size=0.5),
+        axis.title = element_blank(),    
+        axis.text = element_text(size=17),
+        axis.ticks.length=unit(0, 'cm'))
+
+```
+
+

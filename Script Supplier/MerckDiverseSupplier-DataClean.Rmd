@@ -1,0 +1,1078 @@
+  ---
+title: "Personal Assessment Results & Feedback"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Self-rating Dataset
+
+#STOP HERE AND RUN BELOW SEPARATELY 
+```{r cars}
+
+options(repos="https://cran.rstudio.com" )
+install.packages(c('dplyr', 'ggplot2', 'psych', 'reshape2', 'glue', 'tidyr', 'purrr'))
+
+library(dplyr)
+library(ggplot2) 
+library(psych)
+library(reshape2)
+library(glue)
+library(tidyr)
+library(purrr)
+
+```
+
+```{r}
+# Import data (Unnecessary Qualtrics variables were cleaned out in Excel)
+selfDat <- read.csv('C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/SelfMerckSupplier2023.csv', header=T, sep=',', stringsAsFactors=F)
+
+# Put selfDat in alphabetical order by last name
+selfDat <- selfDat[order(selfDat$LName),]
+
+# Making item variables numeric
+selfDat[,7:ncol(selfDat)] <- sapply(selfDat[,7:ncol(selfDat)], as.numeric)
+
+# Reverse-code items
+selfDat$LEff3T <- 8-selfDat$LEff3
+selfDat$LEff5T<- 8-selfDat$LEff5
+selfDat$wit1T <- 8-selfDat$wit1
+selfDat$si4T <- 8-selfDat$si4
+selfDat$si5T <- 8-selfDat$si5
+selfDat$mcon4T <- 8-selfDat$mcon4
+selfDat$mcon5T <- 8-selfDat$mcon5
+selfDat$wit5T <- 8-selfDat$wit5
+selfDat$wit6T <- 8-selfDat$wit6
+selfDat$mot4T <- 8-selfDat$mot4
+selfDat$rtcrs4T <- 8-selfDat$rtcrs4
+selfDat$safe1T <- 8-selfDat$safe1
+selfDat$safe3T <- 8-selfDat$safe3
+selfDat$safe5T <- 8-selfDat$safe5
+selfDat$ks3T <- 8-selfDat$ks3
+
+# Calculate Means for each Scale
+selfDat$LEffx <- round(rowMeans(selfDat[,c('LEff1', 'LEff2', 'LEff3T', 'LEff4', 'LEff5T')], na.rm=T),2) # Leadership Self-Efficacy
+selfDat$PPx <- round(rowMeans(selfDat[,c('ProPer1', 'ProPer4', 'ProPer5', 'ProPer6', 'ProPer8')], na.rm=T),2) # Proactive Personality
+selfDat$EISEx <- round(rowMeans(selfDat[,c('EI_SE2', 'EI_SE3')], na.rm=T),2) # Emotional Intelligence, Self Emotion
+selfDat$EIOEx <- round(rowMeans(selfDat[,c('EI_OE1', 'EI_OE2', 'EI_OE3')], na.rm=T),2) # Emotional Intelligence, Others' Emotion
+selfDat$EIUEx <- round(rowMeans(selfDat[,c('EI_UE1', 'EI_UE3')], na.rm=T),2) # Emotional Intelligence, Use of Emotion
+selfDat$EIREx <- round(rowMeans(selfDat[,c('EI_RE1', 'EI_RE2', 'EI_RE3')], na.rm=T),2) # EI Emotion Regulation
+selfDat$MOTIx <- round(rowMeans(selfDat[,c('mot1', 'mot2', 'mot3', 'mot4T')], na.rm=T),2) # Leadership Motivation
+selfDat$SIx <- round(rowMeans(selfDat[,c('si1', 'si2', 'si3', 'si4T', 'si5T')], na.rm=T),2) # Leadership Social Influence
+selfDat$MCONx <- round(rowMeans(selfDat[,c('mcon1', 'mcon2', 'mcon3', 'mcon4T', 'mcon5T')], na.rm=T),2) # Leadership Managing Conflict
+selfDat$WITx <- round(rowMeans(selfDat[,c('wit1T', 'wit2', 'wit3', 'wit4', 'wit5T', 'wit6T')], na.rm=T),2) # Leadership Working in Teams
+selfDat$LBEx <- round(rowMeans(selfDat[,c('lbe1', 'lbe2', 'lbe3')], na.rm=T),2) # Empowerment Lead by Example
+selfDat$PDMx <- round(rowMeans(selfDat[,c('pdm1', 'pdm2', 'pdm3')], na.rm=T),2) # Empowerment Participative Decision-making
+selfDat$COACHx <- round(rowMeans(selfDat[,c('coach1', 'coach2', 'coach3')], na.rm=T),2) # Empowerment Coaching
+selfDat$INFx <- round(rowMeans(selfDat[,c('inf1', 'inf2', 'inf3')], na.rm=T),2) # Empowerment Informing
+selfDat$SCTIx <- round(rowMeans(selfDat[,c('scti1', 'scti2', 'scti3')], na.rm=T),2) # Empowerment Showing Concern & Team Interaction
+selfDat$RTCRSx <- round(rowMeans(selfDat[,c('rtcrs1', 'rtcrs2', 'rtcrs3', 'rtcrs4T', 'rtcrs5')], na.rm=T),2) # Resistance to Change Routine Seeking
+selfDat$RTCERx <- round(rowMeans(selfDat[,c('rtcer1', 'rtcer2', 'rtcer3', 'rtcer4')], na.rm=T),2) # Resistance to Change Emotional Reaction
+selfDat$NETx <- round(rowMeans(selfDat[,c('net1', 'net2', 'net3', 'net4', 'net5', 'net6')], na.rm=T),2) # Political Networking Abilities
+selfDat$IIx <- round(rowMeans(selfDat[,c('ii1', 'ii2', 'ii3', 'ii4')], na.rm=T),2) # Political Interpersonal Influence
+selfDat$SASx <- round(rowMeans(selfDat[,c('sa1', 'sa2', 'sa3', 'sa4', 'sa5')], na.rm=T),2) # Political Social Astuteness
+selfDat$ASNx <- round(rowMeans(selfDat[,c('asin1', 'asin2', 'asin3')], na.rm=T),2) # Political Apparent Sincerity
+selfDat$MOTAIx <- round(rowMeans(selfDat[,c('motai1', 'motai2', 'motai3')], na.rm=T),2) # Motivation to Lead Affective-Identity
+selfDat$MOTSNx <- round(rowMeans(selfDat[,c('motsn1', 'motsn2', 'motsn3')], na.rm=T),2) # Motivation to Lead Social-Normative
+selfDat$MOTNCx <- round(rowMeans(selfDat[,c('motnc1', 'motnc2', 'motnc3')], na.rm=T),2) # Motivation to Lead Non-calculative
+selfDat$CREx <- round(rowMeans(selfDat[,c('cre1', 'cre2', 'cre3', 'cre4', 'cre5', 'cre6')], na.rm=T),2) # Creativity
+selfDat$PTx <- round(rowMeans(selfDat[,c('pt1', 'pt2', 'pt3', 'pt4')], na.rm=T),2) # Perspective Taking
+selfDat$SAFEx <- round(rowMeans(selfDat[,c('safe1T', 'safe2', 'safe3T', 'safe4', 'safe5T', 'safe6', 'safe7')], na.rm=T),2) # Psychological Safety
+selfDat$IEx <- round(rowMeans(selfDat[,c('ie1', 'ie2', 'ie3', 'ie4', 'ie5')], na.rm=T),2) # Information Elaboration
+selfDat$KSx <- round(rowMeans(selfDat[,c('ks1', 'ks2', 'ks3T', 'ks4')], na.rm=T),2) # Knowledge Sharing
+selfDat$COOPx <- round(rowMeans(selfDat[,c('coop1', 'coop2', 'coop3')], na.rm=T),2) # Cooperation
+selfDat$TMXx <- round(rowMeans(selfDat[,c('tmx1', 'tmx2', 'tmx3', 'tmx4', 'tmx5', 'tmx6')], na.rm=T),2) # TMX Quality
+selfDat$SLx <- round(rowMeans(selfDat[,c('SL1s', 'SL2s', 'SL3s')], na.rm=T),2) # Shared LEadership
+selfDat$ITTx <- round(rowMeans(selfDat[,c('itt1', 'itt2', 'itt3', 'itt4')], na.rm=T),2) # Intrateam Trust
+selfDat$ALTx <- round(rowMeans(selfDat[,c('ALT1s', 'ALT9s', 'ALT17s')], na.rm=T),2) # Altruism
+selfDat$RELx <- round(rowMeans(selfDat[,c('REL2s', 'REL10s', 'REL18s')], na.rm=T),2) # Relationships
+selfDat$PAYx <- round(rowMeans(selfDat[,c('PAY3s', 'PAY11s', 'PAY19s')], na.rm=T),2) # Pay
+selfDat$PRESx <- round(rowMeans(selfDat[,c('PRES4s', 'PRES12s', 'PRES20s')], na.rm=T),2) # Prestige
+selfDat$SECx <- round(rowMeans(selfDat[,c('SEC5s', 'SEC13s', 'SEC21s')], na.rm=T),2) # Security
+selfDat$AUTHx <- round(rowMeans(selfDat[,c('AUTH6s', 'AUTH14s', 'AUTH22s')], na.rm=T),2) # Authority
+selfDat$VARx <- round(rowMeans(selfDat[,c('VAR7s', 'VAR15s', 'VAR23s')], na.rm=T),2) # Variety
+selfDat$AUTOx <- round(rowMeans(selfDat[,c('AUTO8s', 'AUTO16s', 'AUTO24s')], na.rm=T),2) # Autonomy
+selfDat$MBLx <- round(rowMeans(selfDat[,c('MBL1s', 'MBL2s', 'MBL3s', 'MBL4s', 'MBL5s', 'MBL6s', 'MBL7s', 'MBL8s', 'MBL9s')], na.rm=T),2) # Meaning-based leadership
+selfDat$VLx <- round(rowMeans(selfDat[,c('VSL1s', 'VSL2s', 'VSL3s', 'VSL4s', 'VSL5s', 'VSL6s', 'VSL7s', 'VSL8s')], na.rm=T),2) # Visionary Leadership
+
+
+# Aggregate cohort data and add scores to selfDat
+selfDat$XASN <- round(mean(selfDat$ASNx, na.rm=T), 2)
+selfDat$XCOACH <- round(mean(selfDat$COACHx, na.rm=T), 2)
+selfDat$XCOOP <- round(mean(selfDat$COOPx, na.rm=T), 2)
+selfDat$XCRE <- round(mean(selfDat$CREx, na.rm=T), 2)
+selfDat$XEIOE <- round(mean(selfDat$EIOEx, na.rm=T), 2)
+selfDat$XEIRE <- round(mean(selfDat$EIREx, na.rm=T), 2)
+selfDat$XEISE <- round(mean(selfDat$EISEx, na.rm=T), 2)
+selfDat$XEIUE <- round(mean(selfDat$EIUEx, na.rm=T), 2)
+selfDat$XIE <- round(mean(selfDat$IEx, na.rm=T), 2)
+selfDat$XII <- round(mean(selfDat$IIx, na.rm=T), 2)
+selfDat$XINF <- round(mean(selfDat$INFx, na.rm=T), 2)
+selfDat$XITT <- round(mean(selfDat$ITTx, na.rm=T), 2)
+selfDat$XKS <- round(mean(selfDat$KSx, na.rm=T), 2)
+selfDat$XLBE <- round(mean(selfDat$LBEx, na.rm=T), 2)
+selfDat$XLEff <- round(mean(selfDat$LEffx, na.rm=T), 2)
+selfDat$XMCON <- round(mean(selfDat$MCONx, na.rm=T), 2)
+selfDat$XMOTI <- round(mean(selfDat$MOTIx, na.rm=T), 2)
+selfDat$XMOTAI <- round(mean(selfDat$MOTAIx, na.rm=T), 2)
+selfDat$XMOTNC <- round(mean(selfDat$MOTNCx, na.rm=T), 2)
+selfDat$XMOTSN <- round(mean(selfDat$MOTSNx, na.rm=T), 2)
+selfDat$XNET <- round(mean(selfDat$NETx, na.rm=T), 2)
+selfDat$XPDM <- round(mean(selfDat$PDMx, na.rm=T), 2)
+selfDat$XPP <- round(mean(selfDat$PPx, na.rm=T), 2)
+selfDat$XPT <- round(mean(selfDat$PTx, na.rm=T), 2)
+selfDat$XRTCRS <- round(mean(selfDat$RTCRSx, na.rm=T), 2)
+selfDat$XRTCER <- round(mean(selfDat$RTCERx, na.rm=T), 2)
+selfDat$XSAS <- round(mean(selfDat$SASx, na.rm=T), 2)
+selfDat$XSAFE <- round(mean(selfDat$SAFEx, na.rm=T), 2)
+selfDat$XSCTI <- round(mean(selfDat$SCTIx, na.rm=T), 2)
+selfDat$XSI <- round(mean(selfDat$SIx, na.rm=T), 2)
+selfDat$XSL <- round(mean(selfDat$SLx, na.rm=T), 2)
+selfDat$XTMX <- round(mean(selfDat$TMXx, na.rm=T), 2)
+selfDat$XALT <- round(mean(selfDat$ALTx, na.rm=T), 2)
+selfDat$XAUTH <- round(mean(selfDat$AUTHx, na.rm=T), 2)
+selfDat$XAUTO <- round(mean(selfDat$AUTOx, na.rm=T), 2)
+selfDat$XREL <- round(mean(selfDat$RELx, na.rm=T), 2)
+selfDat$XPAY <- round(mean(selfDat$PAYx, na.rm=T), 2)
+selfDat$XSEC <- round(mean(selfDat$SECx, na.rm=T), 2)
+selfDat$XPRES <- round(mean(selfDat$PRESx, na.rm=T), 2)
+selfDat$XVAR <- round(mean(selfDat$VARx, na.rm=T), 2)
+selfDat$XMBL <- round(mean(selfDat$MBLx, na.rm=T), 2)
+selfDat$XVL <- round(mean(selfDat$VLx, na.rm=T), 2)
+selfDat$XWIT <- round(mean(selfDat$WITx, na.rm=T), 2)
+
+```
+
+## Finding range of item responses for each individual
+
+```{r}
+
+# Finding range of item responses for each individual
+selfDat <- selfDat %>% nest(items = c('LEff1', 'LEff2', 'LEff3T', 'LEff4', 'LEff5T'))
+names(selfDat)[names(selfDat) == "items"] <- "LEff"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$LEff, min, na.rm=T), 
+         max = map_dbl(selfDat$LEff, max, na.rm=T),
+         LEffx = glue("{LEffx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('LEff', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('ProPer1', 'ProPer4', 'ProPer5', 'ProPer6', 'ProPer8'))
+names(selfDat)[names(selfDat) == "items"] <- "PP"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$PP, min, na.rm=T), 
+         max = map_dbl(selfDat$PP, max, na.rm=T),
+         PPx = glue("{PPx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('PP', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('EI_SE2', 'EI_SE3'))
+names(selfDat)[names(selfDat) == "items"] <- "EISE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$EISE, min, na.rm=T), 
+         max = map_dbl(selfDat$EISE, max, na.rm=T),
+         EISEx = glue("{EISEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('EISE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('EI_OE1', 'EI_OE2', 'EI_OE3'))
+names(selfDat)[names(selfDat) == "items"] <- "EIOE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$EIOE, min, na.rm=T), 
+         max = map_dbl(selfDat$EIOE, max, na.rm=T),
+         EIOEx = glue("{EIOEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('EIOE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('EI_UE1', 'EI_UE3'))
+names(selfDat)[names(selfDat) == "items"] <- "EIUE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$EIUE, min, na.rm=T), 
+         max = map_dbl(selfDat$EIUE, max, na.rm=T),
+         EIUEx = glue("{EIUEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('EIUE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('EI_RE1', 'EI_RE2', 'EI_RE3'))
+names(selfDat)[names(selfDat) == "items"] <- "EIRE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$EIRE, min, na.rm=T), 
+         max = map_dbl(selfDat$EIRE, max, na.rm=T),
+         EIREx = glue("{EIREx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('EIRE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('mot1', 'mot2', 'mot3', 'mot4T'))
+names(selfDat)[names(selfDat) == "items"] <- "MOTI"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MOTI, min, na.rm=T), 
+         max = map_dbl(selfDat$MOTI, max, na.rm=T),
+         MOTIx = glue("{MOTIx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MOTI', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('si1', 'si2', 'si3', 'si4T', 'si5T'))
+names(selfDat)[names(selfDat) == "items"] <- "SI"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SI, min, na.rm=T), 
+         max = map_dbl(selfDat$SI, max, na.rm=T),
+         SIx = glue("{SIx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SI', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('mcon1', 'mcon2', 'mcon3', 'mcon4T', 'mcon5T'))
+names(selfDat)[names(selfDat) == "items"] <- "MCON"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MCON, min, na.rm=T), 
+         max = map_dbl(selfDat$MCON, max, na.rm=T),
+         MCONx = glue("{MCONx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MCON', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('wit1T', 'wit2', 'wit3', 'wit4', 'wit5T', 'wit6T'))
+names(selfDat)[names(selfDat) == "items"] <- "WIT"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$WIT, min, na.rm=T), 
+         max = map_dbl(selfDat$WIT, max, na.rm=T),
+         WITx = glue("{WITx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('WIT', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('lbe1', 'lbe2', 'lbe3'))
+names(selfDat)[names(selfDat) == "items"] <- "LBE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$LBE, min, na.rm=T), 
+         max = map_dbl(selfDat$LBE, max, na.rm=T),
+         LBEx = glue("{LBEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('LBE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('pdm1', 'pdm2', 'pdm3'))
+names(selfDat)[names(selfDat) == "items"] <- "PDM"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$PDM, min, na.rm=T), 
+         max = map_dbl(selfDat$PDM, max, na.rm=T),
+         PDMx = glue("{PDMx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('PDM', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('coach1', 'coach2', 'coach3'))
+names(selfDat)[names(selfDat) == "items"] <- "COACH"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$COACH, min, na.rm=T), 
+         max = map_dbl(selfDat$COACH, max, na.rm=T),
+         COACHx = glue("{COACHx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('COACH', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('inf1', 'inf2', 'inf3'))
+names(selfDat)[names(selfDat) == "items"] <- "INF"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$INF, min, na.rm=T), 
+         max = map_dbl(selfDat$INF, max, na.rm=T),
+         INFx = glue("{INFx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('INF', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('scti1', 'scti2', 'scti3'))
+names(selfDat)[names(selfDat) == "items"] <- "SCTI"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SCTI, min, na.rm=T), 
+         max = map_dbl(selfDat$SCTI, max, na.rm=T),
+         SCTIx = glue("{SCTIx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SCTI', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('rtcrs1', 'rtcrs2', 'rtcrs3', 'rtcrs4T', 'rtcrs5'))
+names(selfDat)[names(selfDat) == "items"] <- "RTCRS"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$RTCRS, min, na.rm=T), 
+         max = map_dbl(selfDat$RTCRS, max, na.rm=T),
+         RTCRSx = glue("{RTCRSx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('RTCRS', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('rtcer1', 'rtcer2', 'rtcer3', 'rtcer4'))
+names(selfDat)[names(selfDat) == "items"] <- "RTCER"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$RTCER, min, na.rm=T), 
+         max = map_dbl(selfDat$RTCER, max, na.rm=T),
+         RTCERx = glue("{RTCERx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('RTCER', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('net1', 'net2', 'net3', 'net4', 'net5', 'net6'))
+names(selfDat)[names(selfDat) == "items"] <- "NET"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$NET, min, na.rm=T), 
+         max = map_dbl(selfDat$NET, max, na.rm=T),
+         NETx = glue("{NETx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('NET', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('ii1', 'ii2', 'ii3', 'ii4'))
+names(selfDat)[names(selfDat) == "items"] <- "II"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$II, min, na.rm=T), 
+         max = map_dbl(selfDat$II, max, na.rm=T),
+         IIx = glue("{IIx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('II', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('sa1', 'sa2', 'sa3', 'sa4', 'sa5'))
+names(selfDat)[names(selfDat) == "items"] <- "SAS"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SAS, min, na.rm=T), 
+         max = map_dbl(selfDat$SAS, max, na.rm=T),
+         SASx = glue("{SASx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SAS', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('asin1', 'asin2', 'asin3'))
+names(selfDat)[names(selfDat) == "items"] <- "ASN"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$ASN, min, na.rm=T), 
+         max = map_dbl(selfDat$ASN, max, na.rm=T),
+         ASNx = glue("{ASNx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('ASN', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('motai1', 'motai2', 'motai3'))
+names(selfDat)[names(selfDat) == "items"] <- "MOTAI"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MOTAI, min, na.rm=T), 
+         max = map_dbl(selfDat$MOTAI, max, na.rm=T),
+         MOTAIx = glue("{MOTAIx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MOTAI', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('motsn1', 'motsn2', 'motsn3'))
+names(selfDat)[names(selfDat) == "items"] <- "MOTSN"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MOTSN, min, na.rm=T), 
+         max = map_dbl(selfDat$MOTSN, max, na.rm=T),
+         MOTSNx = glue("{MOTSNx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MOTSN', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('motnc1', 'motnc2', 'motnc3'))
+names(selfDat)[names(selfDat) == "items"] <- "MOTNC"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MOTNC, min, na.rm=T), 
+         max = map_dbl(selfDat$MOTNC, max, na.rm=T),
+         MOTNCx = glue("{MOTNCx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MOTNC', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('cre1', 'cre2', 'cre3', 'cre4', 'cre5', 'cre6'))
+names(selfDat)[names(selfDat) == "items"] <- "CRE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$CRE, min, na.rm=T), 
+         max = map_dbl(selfDat$CRE, max, na.rm=T),
+        CREx = glue("{CREx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('CRE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('pt1', 'pt2', 'pt3', 'pt4'))
+names(selfDat)[names(selfDat) == "items"] <- "PT"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$PT, min, na.rm=T), 
+         max = map_dbl(selfDat$PT, max, na.rm=T),
+        PTx = glue("{PTx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('PT', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('safe1T', 'safe2', 'safe3T', 'safe4', 'safe5T', 'safe6', 'safe7'))
+names(selfDat)[names(selfDat) == "items"] <- "SAFE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SAFE, min, na.rm=T), 
+         max = map_dbl(selfDat$SAFE, max, na.rm=T),
+        SAFEx = glue("{SAFEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SAFE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('ie1', 'ie2', 'ie3', 'ie4', 'ie5'))
+names(selfDat)[names(selfDat) == "items"] <- "IE"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$IE, min, na.rm=T), 
+         max = map_dbl(selfDat$IE, max, na.rm=T),
+        IEx = glue("{IEx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('IE', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('ks1', 'ks2', 'ks3T', 'ks4'))
+names(selfDat)[names(selfDat) == "items"] <- "KS"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$KS, min, na.rm=T), 
+         max = map_dbl(selfDat$KS, max, na.rm=T),
+        KSx = glue("{KSx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('KS', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('coop1', 'coop2', 'coop3'))
+names(selfDat)[names(selfDat) == "items"] <- "COOP"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$COOP, min, na.rm=T), 
+         max = map_dbl(selfDat$COOP, max, na.rm=T),
+        COOPx = glue("{COOPx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('COOP', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('tmx1', 'tmx2', 'tmx3', 'tmx4', 'tmx5', 'tmx6'))
+names(selfDat)[names(selfDat) == "items"] <- "TMX"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$TMX, min, na.rm=T), 
+         max = map_dbl(selfDat$TMX, max, na.rm=T),
+        TMXx = glue("{TMXx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('TMX', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('SL1s', 'SL2s', 'SL3s'))
+names(selfDat)[names(selfDat) == "items"] <- "SL"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SL, min, na.rm=T), 
+         max = map_dbl(selfDat$SL, max, na.rm=T),
+        SLx = glue("{SLx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SL', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('itt1', 'itt2', 'itt3', 'itt4'))
+names(selfDat)[names(selfDat) == "items"] <- "ITT"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$ITT, min, na.rm=T), 
+         max = map_dbl(selfDat$ITT, max, na.rm=T),
+        ITTx = glue("{ITTx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('ITT', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('ALT1s', 'ALT9s', 'ALT17s'))
+names(selfDat)[names(selfDat) == "items"] <- "ALT"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$ALT, min, na.rm=T), 
+         max = map_dbl(selfDat$ALT, max, na.rm=T),
+        ALTx = glue("{ALTx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('ALT', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('REL2s', 'REL10s', 'REL18s'))
+names(selfDat)[names(selfDat) == "items"] <- "REL"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$REL, min, na.rm=T), 
+         max = map_dbl(selfDat$REL, max, na.rm=T),
+        RELx = glue("{RELx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('REL', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('PAY3s', 'PAY11s', 'PAY19s'))
+names(selfDat)[names(selfDat) == "items"] <- "PAY"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$PAY, min, na.rm=T), 
+         max = map_dbl(selfDat$PAY, max, na.rm=T),
+        PAYx = glue("{PAYx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('PAY', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('PRES4s', 'PRES12s', 'PRES20s'))
+names(selfDat)[names(selfDat) == "items"] <- "PRES"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$PRES, min, na.rm=T), 
+         max = map_dbl(selfDat$PRES, max, na.rm=T),
+        PRESx = glue("{PRESx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('PRES', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('SEC5s', 'SEC13s', 'SEC21s'))
+names(selfDat)[names(selfDat) == "items"] <- "SEC"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$SEC, min, na.rm=T), 
+         max = map_dbl(selfDat$SEC, max, na.rm=T),
+        SECx = glue("{SECx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('SEC', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('AUTH6s', 'AUTH14s', 'AUTH22s'))
+names(selfDat)[names(selfDat) == "items"] <- "AUTH"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$AUTH, min, na.rm=T), 
+         max = map_dbl(selfDat$AUTH, max, na.rm=T),
+        AUTHx = glue("{AUTHx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('AUTH', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('VAR7s', 'VAR15s', 'VAR23s'))
+names(selfDat)[names(selfDat) == "items"] <- "VAR"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$VAR, min, na.rm=T), 
+         max = map_dbl(selfDat$VAR, max, na.rm=T),
+        VARx = glue("{VARx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('VAR', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('AUTO8s', 'AUTO16s', 'AUTO24s'))
+names(selfDat)[names(selfDat) == "items"] <- "AUTO"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$AUTO, min, na.rm=T), 
+         max = map_dbl(selfDat$AUTO, max, na.rm=T),
+        AUTOx = glue("{AUTOx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('AUTO', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('MBL1s', 'MBL2s', 'MBL3s', 'MBL4s', 'MBL5s', 'MBL6s', 'MBL7s', 'MBL8s', 'MBL9s'))
+names(selfDat)[names(selfDat) == "items"] <- "MBL"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$MBL, min, na.rm=T), 
+         max = map_dbl(selfDat$MBL, max, na.rm=T),
+        MBLx = glue("{MBLx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('MBL', 'min', 'max'))
+
+selfDat <- selfDat %>% nest(items = c('VSL1s', 'VSL2s', 'VSL3s', 'VSL4s', 'VSL5s', 'VSL6s', 'VSL7s', 'VSL8s'))
+names(selfDat)[names(selfDat) == "items"] <- "VL"
+selfDat <- selfDat %>% 
+  mutate(min = map_dbl(selfDat$VL, min, na.rm=T), 
+         max = map_dbl(selfDat$VL, max, na.rm=T),
+        VLx = glue("{VLx} [{min}-{max}]"))
+selfDat <- within(selfDat, rm('VL', 'min', 'max'))
+
+
+
+```
+
+## Peer-rating Dataset
+
+```{r}
+
+# Import data set
+peerDat <- read.csv('C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/PeerMerckSupplier2023.csv', header=T, sep=',', stringsAsFactors=F)
+
+# Make item variables numeric
+peerDat[,4:ncol(peerDat)] <- sapply(peerDat[,4:ncol(peerDat)], as.numeric)
+
+# Make all last names uppercase to ensure proper matching for aggregated data
+peerDat$FName <- sapply(peerDat$FName, toupper)
+peerDat$LName <- sapply(peerDat$LName, toupper)
+selfDat$FName <- sapply(selfDat$FName, toupper)
+selfDat$LName <- sapply(selfDat$LName, toupper)
+
+# Remove any spaces in the names columns
+peerDat$LName <- gsub( " ", "", peerDat$LName) 
+selfDat$LName <- gsub( " ", "", selfDat$LName)
+
+# Reverse-code items
+peerDat$wit1pT <- 8-peerDat$wit1p
+peerDat$si4pT <- 8-peerDat$si4p
+peerDat$si5pT <- 8-peerDat$si5p
+peerDat$mcon4pT <- 8-peerDat$mcon4p
+peerDat$mcon5pT <- 8-peerDat$mcon5p
+peerDat$wit5pT <- 8-peerDat$wit5p
+peerDat$wit6pT <- 8-peerDat$wit6p
+peerDat$mot4pT <- 8-peerDat$mot4p
+
+# Calculate Means
+peerDat$WITpx <- round(rowMeans(peerDat[,c('wit1pT', 'wit2p', 'wit3p', 'wit4p', 'wit5pT', 'wit6pT')], na.rm=T),2)
+peerDat$MOTIpx <- round(rowMeans(peerDat[,c('mot1p', 'mot2p', 'mot3p', 'mot4pT')], na.rm=T),2)
+peerDat$SIpx <- round(rowMeans(peerDat[,c('si1p', 'si2p', 'si3p', 'si4pT', 'si5pT')], na.rm=T),2)
+peerDat$MCONpx <- round(rowMeans(peerDat[,c('mcon1p', 'mcon2p', 'mcon3p', 'mcon4pT', 'mcon5pT')], na.rm=T),2)
+peerDat$LBEpx <- round(rowMeans(peerDat[,c('lbe1p', 'lbe2p', 'lbe3p')], na.rm=T),2)
+peerDat$PDMpx <- round(rowMeans(peerDat[,c('pdm1p', 'pdm2p', 'pdm3p')], na.rm=T),2)
+peerDat$COACHpx <- round(rowMeans(peerDat[,c('coach1p', 'coach2p', 'coach3p')], na.rm=T),2)
+peerDat$INFpx <- round(rowMeans(peerDat[,c('inf1p', 'inf2p', 'inf3p')], na.rm=T),2)
+peerDat$SCTIpx <- round(rowMeans(peerDat[,c('scti1p', 'scti2p', 'scti3p')], na.rm=T),2)
+peerDat$IEpx <- round(rowMeans(peerDat[,c('ie1p', 'ie2p', 'ie3p')], na.rm=T),2)
+peerDat$TMXpx <- round(rowMeans(peerDat[,c('tmx1p', 'tmx2p', 'tmx3p', 'tmx4p', 'tmx5p')], na.rm=T),2)
+peerDat$CREpx <- round(rowMeans(peerDat[,c('cre1p', 'cre2p', 'cre3p', 'cre4p', 'cre5p', 'cre6p')], na.rm=T),2)
+peerDat$COOPpx <- round(rowMeans(peerDat[,c('coop1p', 'coop2p', 'coop3p')], na.rm=T),2)
+peerDat$NETpx <- round(rowMeans(peerDat[,c('net1', 'net2', 'net3', 'net4', 'net5', 'net6')], na.rm=T),2)
+peerDat$IIpx <- round(rowMeans(peerDat[,c('ii1', 'ii2', 'ii3', 'ii4')], na.rm=T),2)
+peerDat$SASpx <- round(rowMeans(peerDat[,c('sa1', 'sa2', 'sa3', 'sa4', 'sa5')], na.rm=T),2)
+peerDat$ASNpx <- round(rowMeans(peerDat[,c('asin1', 'asin2', 'asin3')], na.rm=T),2)
+peerDat$MBLpx <- round(rowMeans(peerDat[,c('MBL1p', 'MBL2p', 'MBL3p', 'MBL4p', 'MBL5p', 'MBL6p', 'MBL7p', 'MBL8p', 'MBL9p')], na.rm=T),2)
+peerDat$VLpx <- round(rowMeans(peerDat[,c('VSL1p', 'VSL2p', 'VSL3p', 'VSL4p', 'VSL5p', 'VSL6p', 'VSL7p', 'VSL8p')], na.rm=T),2)
+
+
+# Aggregate peer data for focal student and add to self dataset
+XWITp <- aggregate(peerDat$WITpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XWITp)[2] <- 'XWITp'
+XMOTIp <- aggregate(peerDat$MOTIpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XMOTIp)[2] <- 'XMOTIp'
+XSIp <- aggregate(peerDat$SIpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XSIp)[2] <- 'XSIp'
+XMCONp <- aggregate(peerDat$MCONpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XMCONp)[2] <- 'XMCONp'
+XLBEp <- aggregate(peerDat$LBEpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XLBEp)[2] <- 'XLBEp'
+XPDMp <- aggregate(peerDat$PDMpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XPDMp)[2] <- 'XPDMp'
+XCOACHp <- aggregate(peerDat$COACHpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XCOACHp)[2] <- 'XCOACHp'
+XINFp <- aggregate(peerDat$INFpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XINFp)[2] <- 'XINFp'
+XSCTIp <- aggregate(peerDat$SCTIpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XSCTIp)[2] <- 'XSCTIp'
+XIEp <- aggregate(peerDat$IEpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XIEp)[2] <- 'XIEp'
+XTMXp <- aggregate(peerDat$TMXpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XTMXp)[2] <- 'XTMXp'
+XCREp <- aggregate(peerDat$CREpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XCREp)[2] <- 'XCREp'
+XCOOPp <- aggregate(peerDat$COOPpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XCOOPp)[2] <- 'XCOOPp'
+XNETp <- aggregate(peerDat$NETpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XNETp)[2] <- 'XNETp'
+XIIp <- aggregate(peerDat$IIpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XIIp)[2] <- 'XIIp'
+XSASp <- aggregate(peerDat$SASpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XSASp)[2] <- 'XSASp'
+XASNp <- aggregate(peerDat$ASNpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XASNp)[2] <- 'XASNp'
+XMBLp <- aggregate(peerDat$MBLpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XMBLp)[2] <- 'XMBLp'
+XVLp <- aggregate(peerDat$VLpx, by=list(LName=peerDat$LName), mean, na.rm=T, na.action=NULL)
+colnames(XVLp)[2] <- 'XVLp'
+
+
+# Add aggregated scores to selfDat
+agg_bind <- cbind(XWITp, XMOTIp[,2, drop=F], XSIp[,2, drop=F], XMCONp[,2, drop=F], XLBEp[,2, drop=F], XPDMp[,2, drop=F],
+XCOACHp[,2, drop=F], XINFp[,2, drop=F], XSCTIp[,2, drop=F], XIEp[,2, drop=F],
+XTMXp[,2, drop=F], XCREp[,2, drop=F], XCOOPp[,2, drop=F], XNETp[,2, drop=F], XIIp[,2, drop=F], XSASp[,2, drop=F], XASNp[,2, drop=F], XMBLp[,2, drop=F], XVLp[,2, drop=F])
+agg_bind[,2:20] <- round(agg_bind[,2:20], 2)
+selfDat <- left_join(selfDat, agg_bind, by='LName')
+
+
+# Aggregate peer data for cohort and add to self dataset
+selfDat$XWITpc <- round(mean(XWITp$XWITp, na.rm=T), 2)
+selfDat$XMOTIpc <- round(mean(XMOTIp$XMOTIp, na.rm=T), 2)
+selfDat$XSIpc <- round(mean(XSIp$XSIp, na.rm=T), 2)
+selfDat$XMCONpc <- round(mean(XMCONp$XMCONp, na.rm=T), 2)
+selfDat$XLBEpc <- round(mean(XLBEp$XLBEp, na.rm=T), 2)
+selfDat$XPDMpc <- round(mean(XPDMp$XPDMp, na.rm=T), 2)
+selfDat$XCOACHpc <- round(mean(XCOACHp$XCOACHp, na.rm=T), 2)
+selfDat$XINFpc <- round(mean(XINFp$XINFp, na.rm=T), 2)
+selfDat$XSCTIpc <- round(mean(XSCTIp$XSCTIp, na.rm=T), 2)
+selfDat$XIEpc <- round(mean(XIEp$XIEp, na.rm=T), 2)
+selfDat$XTMXpc <- round(mean(XTMXp$XTMXp, na.rm=T), 2)
+selfDat$XCREpc <- round(mean(XCREp$XCREp, na.rm=T), 2)
+selfDat$XCOOPpc <- round(mean(XCOOPp$XCOOPp, na.rm=T), 2)
+selfDat$XNETpc <- round(mean(XNETp$XNETp, na.rm=T), 2)
+selfDat$XIIpc <- round(mean(XIIp$XIIp, na.rm=T), 2)
+selfDat$XSASpc <- round(mean(XSASp$XSASp, na.rm=T), 2)
+selfDat$XASNpc <- round(mean(XASNp$XASNp, na.rm=T), 2)
+selfDat$XMBLpc <- round(mean(XMBLp$XMBLp, na.rm=T), 2)
+selfDat$XVLpc <- round(mean(XVLp$XVLp, na.rm=T), 2)
+
+# Clean up
+rm(XWITp, XMOTIp, XSIp, XMCONp, XLBEp, XPDMp, XCOACHp, XINFp, XSCTIp, XIEp, XTMXp, XCREp, XCOOPp, XNETp, XIIp, XSASp, XASNp, XMBLp, XVLp, agg_bind)
+
+```
+
+# MIN/MAX per Scale
+
+```{r}
+#############################################################
+# Finding min/max rating by peers for each measure by student
+#############################################################
+
+peerDat <- peerDat %>% nest(items = c('wit1pT', 'wit2p', 'wit3p', 'wit4p', 'wit5pT', 'wit6pT'))
+names(peerDat)[names(peerDat) == "items"] <- "WIT"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$WIT, min, na.rm=T), 
+         max = map_dbl(peerDat$WIT, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XWITp <- paste0(selfDat$XWITp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('WIT', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('mot1p', 'mot2p', 'mot3p', 'mot4pT'))
+names(peerDat)[names(peerDat) == "items"] <- "MOTI"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$MOTI, min, na.rm=T), 
+         max = map_dbl(peerDat$MOTI, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XMOTIp <- paste0(selfDat$XMOTIp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('MOTI', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('si1p', 'si2p', 'si3p', 'si4pT', 'si5pT'))
+names(peerDat)[names(peerDat) == "items"] <- "SI"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$SI, min, na.rm=T), 
+         max = map_dbl(peerDat$SI, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XSIp <- paste0(selfDat$XSIp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('SI', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('mcon1p', 'mcon2p', 'mcon3p', 'mcon4pT', 'mcon5pT'))
+names(peerDat)[names(peerDat) == "items"] <- "MCON"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$MCON, min, na.rm=T), 
+         max = map_dbl(peerDat$MCON, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XMCONp <- paste0(selfDat$XMCONp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('MCON', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('lbe1p', 'lbe2p', 'lbe3p'))
+names(peerDat)[names(peerDat) == "items"] <- "LBE"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$LBE, min, na.rm=T), 
+         max = map_dbl(peerDat$LBE, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XLBEp <- paste0(selfDat$XLBEp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('LBE', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('pdm1p', 'pdm2p', 'pdm3p'))
+names(peerDat)[names(peerDat) == "items"] <- "PDM"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$PDM, min, na.rm=T), 
+         max = map_dbl(peerDat$PDM, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XPDMp <- paste0(selfDat$XPDMp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('PDM', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('coach1p', 'coach2p', 'coach3p'))
+names(peerDat)[names(peerDat) == "items"] <- "COACH"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$COACH, min, na.rm=T), 
+         max = map_dbl(peerDat$COACH, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XCOACHp <- paste0(selfDat$XCOACHp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('COACH', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('inf1p', 'inf2p', 'inf3p'))
+names(peerDat)[names(peerDat) == "items"] <- "INF"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$INF, min, na.rm=T), 
+         max = map_dbl(peerDat$INF, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XINFp <- paste0(selfDat$XINFp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('INF', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('scti1p', 'scti2p', 'scti3p'))
+names(peerDat)[names(peerDat) == "items"] <- "SCTI"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$SCTI, min, na.rm=T), 
+         max = map_dbl(peerDat$SCTI, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XSCTIp <- paste0(selfDat$XSCTIp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('SCTI', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('ie1p', 'ie2p', 'ie3p'))
+names(peerDat)[names(peerDat) == "items"] <- "IE"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$IE, min, na.rm=T), 
+         max = map_dbl(peerDat$IE, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XIEp <- paste0(selfDat$XIEp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('IE', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('tmx1p', 'tmx2p', 'tmx3p', 'tmx4p', 'tmx5p'))
+names(peerDat)[names(peerDat) == "items"] <- "TMX"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$TMX, min, na.rm=T), 
+         max = map_dbl(peerDat$TMX, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XTMXp <- paste0(selfDat$XTMXp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('TMX', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('cre1p', 'cre2p', 'cre3p', 'cre4p', 'cre5p', 'cre6p'))
+names(peerDat)[names(peerDat) == "items"] <- "CRE"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$CRE, min, na.rm=T), 
+         max = map_dbl(peerDat$CRE, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XCREp <- paste0(selfDat$XCREp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('CRE', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('coop1p', 'coop2p', 'coop3p'))
+names(peerDat)[names(peerDat) == "items"] <- "COOP"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$COOP, min, na.rm=T), 
+         max = map_dbl(peerDat$COOP, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XCOOPp <- paste0(selfDat$XCOOPp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('COOP', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('net1', 'net2', 'net3', 'net4', 'net5', 'net6'))
+names(peerDat)[names(peerDat) == "items"] <- "NET"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$NET, min, na.rm=T), 
+         max = map_dbl(peerDat$NET, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XNETp <- paste0(selfDat$XNETp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('NET', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('ii1', 'ii2', 'ii3', 'ii4'))
+names(peerDat)[names(peerDat) == "items"] <- "II"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$II, min, na.rm=T), 
+         max = map_dbl(peerDat$II, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XIIp <- paste0(selfDat$XIIp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('II', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('sa1', 'sa2', 'sa3', 'sa4', 'sa5'))
+names(peerDat)[names(peerDat) == "items"] <- "SAS"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$SAS, min, na.rm=T), 
+         max = map_dbl(peerDat$SAS, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XSASp <- paste0(selfDat$XSASp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('SAS', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('asin1', 'asin2', 'asin3'))
+names(peerDat)[names(peerDat) == "items"] <- "ASN"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$ASN, min, na.rm=T), 
+         max = map_dbl(peerDat$ASN, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XASNp <- paste0(selfDat$XASNp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('ASN', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('MBL1p', 'MBL2p', 'MBL3p', 'MBL4p', 'MBL5p', 'MBL6p', 'MBL7p', 'MBL8p', 'MBL9p'))
+names(peerDat)[names(peerDat) == "items"] <- "MBL"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$MBL, min, na.rm=T), 
+         max = map_dbl(peerDat$MBL, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XMBLp <- paste0(selfDat$XMBLp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('MBL', 'min', 'max'))
+
+peerDat <- peerDat %>% nest(items = c('VSL1p', 'VSL2p', 'VSL3p', 'VSL4p', 'VSL5p', 'VSL6p', 'VSL7p', 'VSL8p'))
+names(peerDat)[names(peerDat) == "items"] <- "VL"
+peerDat <- peerDat %>% 
+  mutate(min = map_dbl(peerDat$VL, min, na.rm=T), 
+         max = map_dbl(peerDat$VL, max, na.rm=T))
+pD1 <- peerDat %>% 
+  group_by(LName) %>% 
+  summarize(Xmin = min(min, na.rm=T), Xmax = max(max, na.rm=T))  
+pD1 <- pD1 %>% mutate(MM = glue("[{Xmin}-{Xmax}]"))
+selfDat$XVLp <- paste0(selfDat$XVLp, " ", pD1$MM)
+peerDat <- within(peerDat, rm('VL', 'min', 'max'))
+
+rm(pD1)
+
+```
+
+```{r}
+
+# Add additional columns for national averages data
+selfDat$XSAFEpc <- 0
+selfDat$XKSpc <- 0
+selfDat$XRTCERpc <- 0
+selfDat$XRTCRSpc <- 0
+selfDat$XPTpc <- 0
+selfDat$XPPpc <- 0
+
+# Give each student a unique ID
+selfDat$ID <- paste0('MTI', 1:nrow(selfDat))
+
+# Create ScaleID variable for break 
+# (to divide sets up by person and by scale for individual graphs)
+selfDat$ScaleID <- 1:nrow(selfDat)
+
+# Codebook with student names and ID
+codebook <- selfDat[,c('FName', 'LName', 'ID')]
+
+
+# Reshape selfDat into long format for graphing
+dat.long <- melt(selfDat, id.vars=c('FName', 'LName', 'ID', 'ScaleID'), 
+                 measure.vars=c(21:(ncol(selfDat)-2)))
+
+# Rename variable and value columns
+colnames(dat.long)[c(5,6)] <- c('Scale', 'Score')
+
+# Create break variable for each scale for each person
+for (i in 1:nrow(dat.long)) {
+  if(grepl('ASN', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'ASN', dat.long$ScaleID[i])
+  } else if(grepl('COACH', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'COACH', dat.long$ScaleID[i])
+  } else if(grepl('COOP', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'COOP', dat.long$ScaleID[i])
+  } else if(grepl('CRE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'CRE', dat.long$ScaleID[i])
+  } else if(grepl('EIOE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'EIOE', dat.long$ScaleID[i])
+  } else if(grepl('EIRE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'EIRE', dat.long$ScaleID[i])
+  } else if(grepl('EISE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'EISE', dat.long$ScaleID[i])
+  } else if(grepl('EIUE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'EIUE', dat.long$ScaleID[i])
+  } else if(grepl('IE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'IE', dat.long$ScaleID[i])
+  } else if(grepl('II', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'II', dat.long$ScaleID[i])
+  } else if(grepl('INF', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'INF', dat.long$ScaleID[i])
+  } else if(grepl('ITT', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'ITT', dat.long$ScaleID[i])
+  } else if(grepl('KS', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'KS', dat.long$ScaleID[i])
+  } else if(grepl('LBE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'LBE', dat.long$ScaleID[i])
+  } else if(grepl('LEff', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'LEff', dat.long$ScaleID[i])
+  } else if(grepl('MCON', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MCON', dat.long$ScaleID[i])
+  } else if(grepl('MOTI', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MOTI', dat.long$ScaleID[i])
+  } else if(grepl('MOTAI', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MOTAI', dat.long$ScaleID[i])
+  } else if(grepl('MOTNC', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MOTNC', dat.long$ScaleID[i])
+  } else if(grepl('MOTSN', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MOTSN', dat.long$ScaleID[i])
+  } else if(grepl('NET', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'NET', dat.long$ScaleID[i])
+  } else if(grepl('PDM', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'PDM', dat.long$ScaleID[i])
+  } else if(grepl('PP', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'PP', dat.long$ScaleID[i])
+  } else if(grepl('PT', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'PT', dat.long$ScaleID[i])
+  } else if(grepl('RTCRS', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'RTCRS', dat.long$ScaleID[i])
+  } else if(grepl('RTCER', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'RTCER', dat.long$ScaleID[i])
+  } else if(grepl('SAS', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SAS', dat.long$ScaleID[i])
+  } else if(grepl('SAFE', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SAFE', dat.long$ScaleID[i])
+  } else if(grepl('SCTI', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SCTI', dat.long$ScaleID[i])
+  } else if(grepl('SI', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SI', dat.long$ScaleID[i])
+  } else if(grepl('SL', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SL', dat.long$ScaleID[i])
+  } else if(grepl('TMX', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'TMX', dat.long$ScaleID[i])
+  } else if(grepl('WIT', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'WIT', dat.long$ScaleID[i])
+  } else if(grepl('ALT', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'ALT', dat.long$ScaleID[i])
+  } else if(grepl('AUTO', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'AUTO', dat.long$ScaleID[i])
+  } else if(grepl('AUTH', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'AUTH', dat.long$ScaleID[i])
+  } else if(grepl('PAY', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'PAY', dat.long$ScaleID[i])
+  } else if(grepl('REL', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'REL', dat.long$ScaleID[i])
+  } else if(grepl('PRES', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'PRES', dat.long$ScaleID[i])
+  } else if(grepl('SEC', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SEC', dat.long$ScaleID[i])
+  } else if(grepl('VAR', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'VAR', dat.long$ScaleID[i])
+  } else if(grepl('VL', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'VL', dat.long$ScaleID[i])
+  } else if(grepl('MBL', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'MBL', dat.long$ScaleID[i])
+  } else if(grepl('Bel', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'Bel', dat.long$ScaleID[i])
+  } else if(grepl('Uniq', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'Uniq', dat.long$ScaleID[i])
+  } else if(grepl('SG', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SG', dat.long$ScaleID[i])
+  } else if(grepl('EJ', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'EJ', dat.long$ScaleID[i])
+  } else if(grepl('SD', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'SD', dat.long$ScaleID[i])
+  } else if(grepl('ED', dat.long$Scale[i])) {
+    dat.long$ScaleID[i] <- sub('^', 'ED', dat.long$ScaleID[i])
+  } 
+}
+
+# Keep peer cohort scores separate, add national averages into current dat.long
+dat.longPC <- dat.long
+
+# Add in National Values
+for (i in 1:nrow(dat.long)) {
+  if(dat.long$Scale[i]=='XLBEpc') {
+    dat.long$Score[i] <- 5.21
+  } else if(dat.long$Scale[i]=='XPDMpc') {
+    dat.long$Score[i] <- 5.21
+  } else if(dat.long$Scale[i]=='XCOACHpc') {
+    dat.long$Score[i] <- 5.21
+  } else if(dat.long$Scale[i]=='XINFpc') {
+    dat.long$Score[i] <- 5.21
+  } else if(dat.long$Scale[i]=='XSCTIpc') {
+    dat.long$Score[i] <- 5.21
+  } else if(dat.long$Scale[i]=='XSAFEpc') {
+    dat.long$Score[i] <- 5.25
+  } else if(dat.long$Scale[i]=='XIEpc') {
+    dat.long$Score[i] <- 5.04
+  } else if (dat.long$Scale[i]=='XKSpc') {
+    dat.long$Score[i] <- 5.51
+  } else if (dat.long$Scale[i]=='XNETpc') {
+    dat.long$Score[i] <- 3.51
+  } else if (dat.long$Scale[i]=='XIIpc') {
+    dat.long$Score[i] <- 4.01
+  } else if (dat.long$Scale[i]=='XSASpc') {
+    dat.long$Score[i] <- 3.72
+  } else if (dat.long$Scale[i]=='XASNpc') {
+    dat.long$Score[i] <- 4.05
+  } else if (dat.long$Scale[i]=='XTMXpc') {
+    dat.long$Score[i] <- 5.62
+  } else if (dat.long$Scale[i]=='XCREpc') {
+    dat.long$Score[i] <- 4.23
+  } else if (dat.long$Scale[i]=='XRTCRSpc') {
+    dat.long$Score[i] <- 2.85
+  } else if (dat.long$Scale[i]=='XRTCERpc') {
+    dat.long$Score[i] <- 2.85
+  } else if (dat.long$Scale[i]=='XPTpc') {
+    dat.long$Score[i] <- 5.49
+  } else if (dat.long$Scale[i]=='XPPpc') {
+    dat.long$Score[i] <- 5.18
+  } else {
+    dat.long$Score[i] <- dat.long$Score[i]
+  }
+}
+
+# To save datasets:
+write.csv(selfDat, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/SelfRatingsRange.csv', row.names=F)
+
+write.csv(peerDat, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/PeerRatingsRange.csv', row.names=F)
+
+#Peer data with national comparison scores. This is the one we graph from in the next R file. The other ones are separate files in case. 
+write.csv(dat.long, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/CombinedDataNational.csv', row.names=F)
+
+#Aggregated peer score just in case anyone wants this original data (we overwrite some of this in the national file)
+write.csv(dat.longPC, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/Merck2022Combined.csv', row.names=F)
+
+```
+
+```{r}
+setwd ('C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier')
+```
+
+#it is okay with you get a message ^ saying attributes are not identical across measure variables; they will be dropped
+```{r}
+#THIS CHUNK OFTEN DOES NOT RUN. Copy and past it above, but then delete it afterwards.
+
+# To save datasets:
+write.csv(selfDat, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/SelfRatingsRange.csv', row.names=F)
+
+write.csv(peerDat, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/PeerRatingsRange.csv', row.names=F)
+
+#Peer data with national comparison scores. This is the one we graph from in the next R file. The other ones are separate files in case. 
+write.csv(dat.long, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/CombinedDataNational.csv', row.names=F)
+
+#Aggregated peer score just in case anyone wants this original data (we overwrite some of this in the national file)
+write.csv(dat.longPC, 'C:/Users/dal362/OneDrive - Drexel University/Desktop/Exec Ed/MERCK Diverse Supplier/Combined.csv', row.names=F)
+ ```
+
