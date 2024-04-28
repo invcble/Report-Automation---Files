@@ -1,0 +1,8 @@
+MOTAI14 = here MOTAI is specific statistic and 14 is person identifier
+
+Attitude and Motivation Towards Leading
+-------->> MOTAI, MOTSN, MOTNC, LEff
+
+
+
+Ask about template, since images will be auto, what writings have to be automated as well
