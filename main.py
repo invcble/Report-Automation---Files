@@ -9,7 +9,7 @@ import sys, os, shutil
 
 
 # combined_csv_path = input("Paste the path to Combined CSV: ")[1:-1]
-combined_csv_path = "CombinedDataNational.csv"
+combined_csv_path = "Merck2024Combined_Suppliers.csv"
 # feedback_csv_path = "Namefixed_ALLpeersMerk2024.csv"
 # employee_num = int(input("Enter total number of employees: "))
 employee_num = 50
