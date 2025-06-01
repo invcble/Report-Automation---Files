@@ -6,16 +6,51 @@ from PIL import Image
 from datetime import datetime
 import WorkbookReport as wr
 import sys, os, shutil
+import pandas as pd
+import re
 
 
-# combined_csv_path = input("Paste the path to Combined CSV: ")[1:-1]
-combined_csv_path = "Namefixed_MerckCombined.csv"
-feedback_csv_path = "Namefixed_ALLpeersMerk2024.csv"
-# employee_num = int(input("Enter total number of employees: "))
-employee_num = 50
+def clean_ascii_str(s: str) -> str:
+    return re.sub(r'[^\x00-\x7F]', '', str(s)) if pd.notna(s) else s
+
+def clean_ascii_names(df: pd.DataFrame) -> pd.DataFrame:
+    for col in ['FName', 'LName']:
+        if col in df.columns:
+            df[col] = df[col].apply(lambda x: clean_ascii_str(x))
+    return df
+
+def load_and_clean_to_csv(input_path: str, prefix: str) -> str:
+    base_dir, fname = os.path.split(input_path)
+    name_no_ext, ext = os.path.splitext(fname)
+    temp_name = f"{prefix}_cleaned.csv"
+    temp_path = os.path.join(base_dir, temp_name)
+
+    if ext.lower() in ['.xls', '.xlsx']:
+        df = pd.read_excel(input_path)
+    else:
+        df = pd.read_csv(input_path)
+
+    df = clean_ascii_names(df)
+    df.to_csv(temp_path, index=False)
+    return temp_path
+
+# ─────────────────────────────────────────────────────────────────────────────
+combined_csv_path = "2025\\CombinedDataNational_py.csv"
+feedback_csv_path = "2025\\PeerDat.xlsx"
+LOGO_PATH      = "secondary_script_incubator\\Merck_Logo.png"
+TEMPLATE_PATH  = "secondary_script_incubator\\Merk_Talent_Incubator.pdf"
+employee_num = 500
+# ─────────────────────────────────────────────────────────────────────────────
+
+cleaned_combined_path = load_and_clean_to_csv(combined_csv_path, prefix="combined")
+cleaned_feedback_path = load_and_clean_to_csv(feedback_csv_path, prefix="feedback")
+
+combined_csv_path = cleaned_combined_path
+feedback_csv_path = cleaned_feedback_path
+
 
 date = datetime.today().strftime('%B %Y')
-png = Image.open("Merck_Logo.png")      ###########  LOGO HERE  #############
+png = Image.open(LOGO_PATH)
 logo = ImageReader(png)
 white_logo = ImageReader(Image.composite(Image.new('RGBA', png.size, (255, 255, 255, 255)), png, png))
 
@@ -39,7 +74,7 @@ for s in range(employee_num):
     o.drawString(62, 564, name +', '+ date)
     o.drawImage(white_logo, 422.5, 60.8, 115, 35, mask="auto", preserveAspectRatio=True )
 
-    template = PdfReader("new_Merk_Talent_Incubator.pdf")      ###########  TEMPLATE HERE  #############
+    template = PdfReader(TEMPLATE_PATH)
     #Actual Page No. is pagenum + 2
     for pagenum in range(len(template.pages)-1):
         o.showPage()
