@@ -12,7 +12,7 @@ import sys, os, shutil
 combined_csv_path = "CombinedDataNational_Suppliers.csv"
 # feedback_csv_path = "Namefixed_ALLpeersMerk2024.csv"
 # employee_num = int(input("Enter total number of employees: "))
-employee_num = 50
+employee_num = 500
 
 date = datetime.today().strftime('%B %Y')
 png = Image.open("Merck_Logo.png")      ###########  LOGO HERE  #############
