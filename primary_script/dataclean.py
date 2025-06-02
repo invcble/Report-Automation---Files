@@ -10,8 +10,8 @@ warnings.filterwarnings("ignore", category=PerformanceWarning)
  
 # --- Configuration ---
 OUTPUT_DIR = '.'
-SELF_DAT_PATH = "primary_script\\2025\\SelfDat.xlsx"
-MASTER_RATER_FILE_PATH = "primary_script\\2025\\PeerDat.xlsx"
+SELF_DAT_PATH = ".\\2025\\SelfDat.csv"
+MASTER_RATER_FILE_PATH = ".\\2025\\PeerDat.csv"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 self_reverse_coded_map = {
@@ -118,8 +118,8 @@ if self_dat.empty:
     print(f"FATAL ERROR: Self-rating file {SELF_DAT_PATH} is empty. Exiting.")
     exit()
 self_dat = self_dat.sort_values(by='LName').reset_index(drop=True)
-self_dat['FName'] = self_dat['FName'].astype(str).str.upper().str.replace(" ", "", regex=False)
-self_dat['LName'] = self_dat['LName'].astype(str).str.upper().str.replace(" ", "", regex=False)
+self_dat['FName'] = self_dat['FName'].astype(str).str.replace(" ", "\u00A0", regex=False)
+self_dat['LName'] = self_dat['LName'].astype(str).str.replace(" ", "\u00A0", regex=False)
 self_item_cols_to_convert = get_all_item_cols(self_scales_def, self_reverse_coded_map)
 for col in self_item_cols_to_convert:
     if col in self_dat.columns:
@@ -176,8 +176,8 @@ if not master_rater_dat.empty:
         print(f"ERROR: Column 'Q34' not found in {MASTER_RATER_FILE_PATH}. Cannot filter rater groups. Rater scores will be missing.")
         master_rater_dat = pd.DataFrame()
 if not master_rater_dat.empty:
-    master_rater_dat['FName'] = master_rater_dat['FName'].astype(str).str.upper().str.replace(" ", "", regex=False)
-    master_rater_dat['LName'] = master_rater_dat['LName'].astype(str).str.upper().str.replace(" ", "", regex=False)
+    master_rater_dat['FName'] = master_rater_dat['FName'].astype(str).str.replace(" ", "\u00A0", regex=False)
+    master_rater_dat['LName'] = master_rater_dat['LName'].astype(str).str.replace(" ", "\u00A0", regex=False)
     for col in all_rater_base_item_cols:
         if col in master_rater_dat.columns:
             master_rater_dat[col] = pd.to_numeric(master_rater_dat[col], errors='coerce')
@@ -214,8 +214,9 @@ if not master_rater_dat.empty:
         else:
             peer_snapshot_dat[snapshot_scale_col] = np.nan
     if not peer_snapshot_dat.empty:
-        peer_snapshot_dat.to_csv(os.path.join(OUTPUT_DIR, 'peerRatingsRange_py.csv'), index=False)
-        print(f"Saved peerRatingsRange_py.csv with {len(peer_snapshot_dat.columns)} columns.")
+        pass
+        # peer_snapshot_dat.to_csv(os.path.join(OUTPUT_DIR, 'peerRatingsRange_py.csv'), index=False)
+        # print(f"Saved peerRatingsRange_py.csv with {len(peer_snapshot_dat.columns)} columns.")
     else:
         print("Warning: peer_snapshot_dat for peerRatingsRange_py.csv was empty.")
     for group_def in rater_group_definitions:

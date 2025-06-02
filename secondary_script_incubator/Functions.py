@@ -5,7 +5,7 @@ import numpy as np
 
 def get_name(dataframe, s):
     newdf = dataframe[dataframe['ScaleID'] == 'MOTAI'+f'{s}']
-    return newdf['FName'].values[0][0] + '. ' + newdf['LName'].values[0].capitalize()
+    return newdf['FName'].values[0][0] + '. ' + newdf['LName'].values[0] , newdf['LName'].values[0] + '_' + newdf['FName'].values[0]
 
 ################################################################################################
 

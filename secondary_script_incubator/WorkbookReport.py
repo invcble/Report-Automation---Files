@@ -6,9 +6,9 @@ import Functions
 def get_feedback(combined_csv_path, feedback_csv_path, s):
     df = pd.read_csv(combined_csv_path)
     tempdf = df[df['ScaleID'] == 'MOTAI'+f'{s}']
-    fname = tempdf['FName'].values[0].capitalize()
-    lname = tempdf['LName'].values[0].capitalize()
-    # print(fname, lname)
+    fname = tempdf['FName'].values[0].replace(" ", "\u00A0")
+    lname = tempdf['LName'].values[0].replace(" ", "\u00A0")
+    print(fname, lname)
 
     df = pd.read_csv(feedback_csv_path)
     df1 =  df[(df['LName'] == lname) & (df['FName'] == fname)]['Q1'].dropna().values
